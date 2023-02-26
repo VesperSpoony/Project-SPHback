@@ -39,10 +39,22 @@ module.exports = {
     },
     // 配置代理跨域
     proxy: {
-      'dev-api': {
+      // '/acl': {
+      //   target: 'http://39.98.123.211:8170/',
+      //   pathRewrite: { '^/acl': '' }
+      // },
+      // '/product': {
+      //   target: 'http://39.98.123.211:8510',
+      //   pathRewrite: { '^/product': '' }
+      // },
+      '/dev-api': {
         target: 'http://39.98.123.211:8170',
         pathRewrite: { '^/dev-api': '' }
-      }
+      },
+      '/handle-api': {
+        target: 'http://39.98.123.211:8510',
+        pathRewrite: { '^/handle-api': '' },
+      },
     }
   },
   configureWebpack: {

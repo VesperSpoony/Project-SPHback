@@ -1,5 +1,5 @@
 // 引入二次封装后的axios
-import request from '@/utils/request'
+import request from '@/utils/login-request'
 
 // 对外暴露登录接口函数
 export function login(data) {
