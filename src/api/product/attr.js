@@ -19,8 +19,15 @@ export const reqCategory3List = (category2Id) => request({
     method: 'get'
 })
 
-// 获取平台属性 GET /admin/product/attrInfoList/{category1Id}/{category2Id}/{category3Id} get 参数3个id
+// 获取平台属性  /admin/product/attrInfoList/{category1Id}/{category2Id}/{category3Id} get 参数3个id
 export const reqAttrList = (category1Id, category2Id, category3Id) => request({
     url: `/admin/product/attrInfoList/${category1Id}/${category2Id}/${category3Id}`,
     method: 'get'
+})
+
+// 添加属性与属性值 /admin/product/saveAttrInfo post 参数data
+export const reqAddOrUpdateAttr = data => request({
+    url: '/admin/product/saveAttrInfo',
+    data,
+    method: 'post'
 })
