@@ -3,14 +3,20 @@
     <el-card style="margin: 20px 0">
       <CategorySelect
         @getCategoryId="getCategoryId"
-        :show="!show"
+        :show="scene != 0"
       ></CategorySelect>
     </el-card>
     <!-- 三部分进行切换 -->
     <el-card>
       <!-- 展示Spu列表结构 -->
       <div v-show="scene == 0">
-        <el-button type="primary" icon="el-icon-plus" style="margin: 10px 0">
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          style="margin: 10px 0"
+          :disabled="!category3Id"
+          @click="addSpu"
+        >
           添加Spu
         </el-button>
         <el-table border style="width: 100%" :data="records">
@@ -39,7 +45,7 @@
                 icon="el-icon-edit"
                 size="mini"
                 title="修改Spu"
-                @click=""
+                @click="updateSpu(row)"
               ></HintButton>
               <HintButton
                 type="info"
@@ -58,23 +64,27 @@
             </template>
           </el-table-column>
         </el-table>
+        <el-pagination
+          style="text-align: center"
+          :current-page="page"
+          :page-sizes="[3, 5, 10]"
+          :page-size="limit"
+          layout="prev, pager, next, jumper, ->, total, sizes"
+          :total="total"
+          @current-change="getSpuList"
+          @size-change="sizeChange"
+        >
+        </el-pagination>
       </div>
       <!-- 添加/修改Spu -->
-      <SpuForm v-show="scene == 1"></SpuForm>
+      <SpuForm
+        v-show="scene == 1"
+        @changeScene="changeScene"
+        ref="spu"
+      ></SpuForm>
       <!-- 添加Sku -->
       <SkuForm v-show="scene == 2"></SkuForm>
     </el-card>
-    <el-pagination
-      style="text-align: center"
-      :current-page="page"
-      :page-sizes="[3, 5, 10]"
-      :page-size="limit"
-      layout="prev, pager, next, jumper, ->, total, sizes"
-      :total="total"
-      @current-change="getSpuList"
-      @size-change="sizeChange"
-    >
-    </el-pagination>
   </div>
 </template>
 
@@ -124,6 +134,19 @@ export default {
     sizeChange(limit) {
       this.limit = limit;
       this.getSpuList();
+    },
+
+    addSpu() {
+      this.scene = 1;
+    },
+
+    updateSpu(row) {
+      this.scene = 1;
+      this.$refs.spu.initSpuData(row);
+    },
+
+    changeScene(scene) {
+      this.scene = scene;
     },
   },
 };
