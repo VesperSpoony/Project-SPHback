@@ -112,8 +112,8 @@
         </el-table>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">保存</el-button>
-        <el-button @click="$emit('changeScene', 0)">取消</el-button>
+        <el-button type="primary" @click="addOrUpdateSpu">保存</el-button>
+        <el-button @click="cancel">取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -130,7 +130,7 @@ export default {
         category3Id: 0,
         description: "",
         spuName: "",
-        tmId: 0,
+        tmId: "",
         spuImageList: [
           // {
           //   id: 0,
@@ -242,6 +242,45 @@ export default {
       };
       row.spuSaleAttrValueList.push(newSaleAttrValue);
       row.inputVisible = false;
+    },
+    // 保存Spu
+    async addOrUpdateSpu() {
+      this.spu.spuImageList = this.spuImageList.map((item) => {
+        return {
+          imageName: item.name,
+          imageUrl: (item.response && item.response.data) || item.url,
+        };
+      });
+      let result = await this.$API.spu.reqAddOrUpdateSpu(this.spu);
+      if (result.code == 200) {
+        this.$message({ type: "success", message: "保存成功" });
+
+        this.$emit("changeScene", {
+          scene: 0,
+          flag: this.spu.id ? "修改" : "添加",
+        });
+      }
+      Object.assign(this._data, this.$options.data());
+    },
+    // 取消
+    cancel() {
+      this.$emit("changeScene", { scene: 0, flag: "" });
+      //Object.assign 合并对象
+      Object.assign(this._data, this.$options.data());
+    },
+    // 添加Spu
+    async addSpuData(category3Id) {
+      this.spu.category3Id = category3Id;
+      // 获取品牌信息
+      let tradeMarkResult = await this.$API.spu.reqTradeMarkList();
+      if (tradeMarkResult.code == 200) {
+        this.tradeMarkList = tradeMarkResult.data;
+      }
+      // 获取平台销售属性
+      let saleResult = await this.$API.spu.reqBaseSaleAttrList();
+      if (saleResult.code == 200) {
+        this.saleAttrList = saleResult.data;
+      }
     },
   },
   computed: {
