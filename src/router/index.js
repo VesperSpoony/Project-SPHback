@@ -30,6 +30,7 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+// 常量路由
 export const constantRoutes = [
   {
     path: '/login',
@@ -54,6 +55,56 @@ export const constantRoutes = [
       meta: { title: '首页', icon: 'dashboard' }
     }]
   },
+]
+
+// 异步路由
+export const asyncRoutes = [
+  {
+    name: 'Acl',
+    path: '/acl',
+    component: Layout,
+    redirect: '/acl/user/list',
+    meta: {
+      title: '权限管理',
+      icon: 'el-icon-lock'
+    },
+    children: [
+      {
+        name: 'User',
+        path: 'user/list',
+        component: () => import('@/views/acl/user/list'),
+        meta: {
+          title: '用户管理',
+        },
+      },
+      {
+        name: 'Role',
+        path: 'role/list',
+        component: () => import('@/views/acl/role/list'),
+        meta: {
+          title: '角色管理',
+        },
+      },
+      {
+        name: 'RoleAuth',
+        path: 'role/auth/:id',
+        component: () => import('@/views/acl/role/roleAuth'),
+        meta: {
+          activeMenu: '/acl/role/list',
+          title: '角色授权',
+        },
+        hidden: true,
+      },
+      {
+        name: 'Permission',
+        path: 'permission/list',
+        component: () => import('@/views/acl/permission/list'),
+        meta: {
+          title: '菜单管理',
+        },
+      },
+    ]
+  },
 
   {
     path: '/product',
@@ -63,7 +114,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'trademark',
-        name: 'TradeMark',
+        name: 'Trademark',
         component: () => import('@/views/product/TradeMark'),
         meta: { title: '品牌管理' },
       },
@@ -71,7 +122,7 @@ export const constantRoutes = [
         path: 'attr',
         name: 'Attr',
         component: () => import('@/views/product/Attr'),
-        meta: { title: '属性管理' },
+        meta: { title: '平台属性管理' },
       },
       {
         path: 'spu',
@@ -87,7 +138,10 @@ export const constantRoutes = [
       },
     ]
   },
+]
 
+// 任意路由 路径出现错误时重定向到404
+export const anyRoutes = [
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

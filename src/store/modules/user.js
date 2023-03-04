@@ -1,12 +1,20 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { resetRouter } from '@/router'
+import { resetRouter, constantRoutes, anyRoutes, asyncRoutes } from '@/router'
+import router from '@/router'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    routes: [],
+    roles: [],
+    buttons: [],
+    // 项目中已有的异步路由与服务器返回的标记信息进行对比，最终需要展示的异步路由
+    resultAsyncRoutes: [],
+    // 最终需要展示的全部路由
+    resultAllRoutes: []
   }
 }
 
@@ -19,12 +27,25 @@ const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_NAME: (state, name) => {
-    state.name = name
+
+  // 存储用户信息
+  SET_USERINFO: (state, userInfo) => {
+    state.name = userInfo.name;
+    state.avatar = userInfo.avatar;
+    state.routes = userInfo.routes;
+    state.buttons = userInfo.buttons;
+    state.roles = userInfo.roles;
   },
-  SET_AVATAR: (state, avatar) => {
-    state.avatar = avatar
+
+  // 最终计算出的异步路由
+  SET_RESULTASYNCROUTES: (state, asyncRoutes) => {
+    state.resultAsyncRoutes = asyncRoutes;
+    // 计算当前用户需要展示的所有路由
+    state.resultAllRoutes = constantRoutes.concat(state.resultAsyncRoutes, anyRoutes);
+
+    router.addRoutes(state.resultAllRoutes);
   }
+
 }
 
 const actions = {
@@ -57,14 +78,12 @@ const actions = {
       getInfo(state.token).then(response => {
         const { data } = response
 
-        if (!data) {
-          return reject('Verification failed, please Login again.')
-        }
+        // 存储用户全部信息
+        commit('SET_USERINFO', data);
 
-        const { name, avatar } = data
 
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_RESULTASYNCROUTES', computedAsyncRoutes(asyncRoutes, data.routes))
+
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -94,6 +113,19 @@ const actions = {
       resolve()
     })
   }
+}
+
+// 两个数组进行对比，计算出当前用户到底显示哪些异步路由
+const computedAsyncRoutes = (asyncRoutes, routes) => {
+  // 过滤出当前用户需要展示的异步路由
+  return asyncRoutes.filter(item => {
+    if (routes.indexOf(item.name) != -1) {
+      if (item.children && item.children.length) {
+        item.children = computedAsyncRoutes(item.children, routes);
+      }
+      return true;
+    }
+  })
 }
 
 export default {

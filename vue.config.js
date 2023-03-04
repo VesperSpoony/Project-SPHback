@@ -55,7 +55,8 @@ module.exports = {
         target: 'http://39.98.123.211:8510',
         pathRewrite: { '^/handle-api': '' },
       },
-    }
+    },
+    after: require('./mock/mock-server.js')
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
